@@ -1,0 +1,98 @@
+body{
+    background: rgb(18,100,87);
+    background: linear-gradient(90deg, rgba(18,100,87,1) 0%, rgba(18,100,87,1) 19%, rgba(227,250,246,1) 22%, rgba(227,250,246,1) 52%, rgba(227,250,246,1) 78%, rgba(18,100,87,1) 81%, rgba(18,100,87,1) 100%, rgba(18,100,87,1) 100%, rgba(0,212,255,1) 100%);
+}
+    .cellImg{
+    visibility: hidden;
+}
+.titleDiv{
+    display: grid;
+    justify-content: center;
+    align-items: center; 
+    margin-bottom: 0px;
+    gap: 400px;
+    grid-auto-flow: column;
+
+}
+.imgTitle{
+    display: inline-block;
+}
+
+.title{
+    display: inline-block;
+    font-size: 70px;
+  font-weight: 600;
+  color: rgb(18, 100, 87 );
+  margin-bottom: 0px;
+}
+.vertDiv{
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    gap:0px;
+    grid-auto-flow: row;
+    margin-top: 10px;
+}
+.instructionDiv{
+    display: grid;
+    justify-content: center;
+    align-items: center; 
+    margin-bottom: 0px;
+    gap: 20px;
+    grid-auto-flow: column;
+
+}
+.instruction{
+  display: inline-block;
+  width: 400px;
+  height: 50px;
+  font-size: 30px;
+  font-weight: 300;
+  color:rgba(18, 100, 87 );
+  border: 5px solid;
+  border-radius: 10%;
+  border-color: solid black;
+  padding: 10px;
+  text-align: center;
+  padding-top: 15px;
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.grid{
+    display: grid;
+    grid-template-columns: repeat(9, 120px);
+    grid-template-rows: repeat(9, 80px);
+    margin: 0 auto;
+    justify-content: center;
+}
+
+.cell{
+    border: 5px solid rgb(227, 250, 246 ) ; 
+    background-color: rgb( 137, 163, 159);
+    border-radius: 20%;
+}
+.numberCell{
+    background-color: rgb(227, 250, 246 );
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+.numberCell h1{
+    text-align: center;
+    display: inline-block;
+}
+.resetDiv{
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+}
+.resetButton{
+    background-color: rgb(18, 100, 87 );
+    border: 1px solid rgb(18, 100, 87 );
+    border-radius: 6px;
+    font-size: 30px;
+    font-weight: 300;
+}
+

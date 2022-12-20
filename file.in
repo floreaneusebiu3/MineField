@@ -1,0 +1,14 @@
+formulas(assumptions).
+all x -mine(x, 0).
+all x -mine(4,x).
+mine(3,2).
+mine(4,4) | mine(1,4).
+-mine(5,7) & -mine(6,7) & -mine(7,7).
+all x -mine(7, x).
+mine(1,1).
+mine(6,5) & -(mine(6,6)).
+end_of_list.
+
+formulas(goals).
+-mine(0,1).
+end_of_list.

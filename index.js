@@ -2,8 +2,9 @@ const Websocket = require('ws')
 
 //create a new websocket server
 
-const wss = new Websocket.Server({port:8080})
-var assump = []
+const wss = new Websocket.Server({port:8080})       
+wss.on('connection', (ws) => {
+  var assump = []
     assump.push("all x -mine(x, 0).\n",
                "all x -mine(4,x).\n",
                "mine(3,2).\n",
@@ -15,17 +16,34 @@ var assump = []
                )
 var formulas = assump[0]    
 var minesCoord = []
-minesCoord.push( {x:1, y:1} , {x:1, y:4}, {x:3,y:2} , {x:6,y:5} )         
-wss.on('connection', (ws) => {
-    console.log('A new client is connected')
+minesCoord.push( {x:1, y:1} , {x:1, y:4}, {x:3,y:2} , {x:6,y:5} )  
+  const fs = require('fs')  
+  try {
+    const data = fs.writeFileSync('file.in', "formulas(assumptions).\n"  + "end_of_list.\n\n" + 
+    "formulas(goals).\n"+ "\n"+ "end_of_list.")
+    //file written successfully
+  } catch (err) {
+    console.error(err);
+  }    
+console.log('A new client is connected')
 ws.send("hi client, I am server") 
 ws.on('message', (data) => {
+    if(data.toString() === 'reset'){
+      try {
+        const data = fs.writeFileSync('file.in', "formulas(assumptions).\n"  + "end_of_list.\n\n" + 
+        "formulas(goals).\n"+ "\n"+ "end_of_list.")
+        //file written successfully
+      } catch (err) {
+        console.error(err);
+      } 
+      formulas = assump[0]
+      return
+    }
     var coordo = data.toString().split(',');
     var xCoordo = coordo[0];
     var yCoordo = coordo[1];
     console.log(xCoordo);
-    console.log(yCoordo);
-    const fs = require('fs')    
+    console.log(yCoordo);  
      if(xCoordo == 7 && yCoordo == 0 && formulas.includes(assump[1]) == false)
           formulas+=assump[1]
      if(xCoordo == 4 && yCoordo == 3 && formulas.includes(assump[2]) == false)
@@ -57,24 +75,21 @@ exec('prover9 -f file.in',
         //console.log('stderr: ' + stderr);
 
         var result = stdout.toString();
+        if((minesCoord.some(item => item.x === parseInt(xCoordo) && item.y === parseInt(yCoordo)) == true)) {
+          console.log("bomb");
+          ws.send('bomb'); 
+     }
         if(result.includes("THEOREM PROVED") && formulas.length <165) {
              console.log("ok");
              ws.send("ok");
-           } else if(result.includes("THEOREM PROVED") == false && formulas.length <165){
+           } else if(result.includes("THEOREM PROVED") === false && formulas.length <165){
              console.log("notok");
              ws.send("notok");
              }
-             else if(formulas.length >=165 && (minesCoord.some(item => item.x != parseInt(xCoordo) && item.y != parseInt(yCoordo)) == false)) {
-                  console.log(minesCoord.some(item => item.x === parseInt(xCoordo) && item.y === parseInt(yCoordo)));
-                  console.log({x:parseInt(xCoordo), y:parseInt(yCoordo)})
-                  console.log(typeof parseInt(xCoordo))
-                  console.log(typeof minesCoord[0].x)
+             else if(formulas.length >=165 && (minesCoord.some(item => item.x === parseInt(xCoordo) && item.y === parseInt(yCoordo)) == false)) {
                   ws.send("ok");  
              }
-             else if(formulas.length >=165 && (minesCoord.some(item => item.x != parseInt(xCoordo) && item.y != parseInt(yCoordo)) == true)) {
-                 console.log("bomb");
-                 ws.send('bomb'); 
-            }
+             
                 
     });
     

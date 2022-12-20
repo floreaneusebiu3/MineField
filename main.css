@@ -42,7 +42,7 @@ body{
     grid-auto-flow: column;
 
 }
-.instruction{
+.instruction {
   display: inline-block;
   width: 400px;
   height: 50px;
@@ -82,11 +82,19 @@ body{
     text-align: center;
     display: inline-block;
 }
-.resetDiv{
+.centerDiv{
     display: grid;
     justify-content: center;
     align-items: center;
     margin-top: 50px;
+}
+.message{
+    display: inline-block;
+    font-size: 30px;
+    font-weight: 300;
+    color:rgba(18, 100, 87);
+    margin:0px;
+    text-align: center;
 }
 .resetButton{
     background-color: rgb(18, 100, 87 );

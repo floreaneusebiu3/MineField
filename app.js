@@ -1,11 +1,8 @@
+var scoreValue = 0
+var honestValue = true
 const websocket = new WebSocket("ws://localhost:8080")
-websocket.addEventListener('open', () => {
-    console.log('we are connected')
-})
-websocket.addEventListener('message', ({data}) => {
-    var element = document.getElementById("score")
-    element.innerHTML = data.toString()
- })
+var en = true
+
 $(document).ready(function(){
         var xCount = 0;
         var yCount = 0;
@@ -13,8 +10,12 @@ $(document).ready(function(){
         $(".cell").each( function(){   
         $(this).attr("xCoord", xCount);   
         $(this).attr("yCoord", yCount);
-        if(yCount == 0 && xCount == 0)
-        $(this).css("background-color", "rgb(6, 104, 87)");
+        $(this).attr("visited", "false")
+        if(yCount == 0 && xCount == 0){
+          $(this).css("background-color", "rgb(6, 104, 87)");
+          $(this).attr("visited", "true")
+        }
+        
         if(yCount == 7) {
            yCount=0;
            xCount+=1;
@@ -28,12 +29,24 @@ $(document).ready(function(){
 
    //here reset all grid
    document.getElementById("rst").addEventListener('click', function(event){
+    websocket.send('reset')
+    scoreValue = 0;
+    score.innerHTML = "score: " + scoreValue
+    honestValue = true
+    honest.innerHTML = "honest"
+    instr = document.getElementById('ins')
+    instr.style.background = "rgb(227, 250, 246 )"
+    instr.innerHTML = "all x -mine(x, 0)."
+    en = true
     $(".cell").each(function(){
+        $(this).attr("visited", "false")
         var xCellPosition = parseInt( $(this).attr("xCoord"));
         var yCellPosition = parseInt( $(this).attr("yCoord")); 
+        if(xCellPosition == 0 && yCellPosition == 0)
+        $(this).attr("visited", "false")
         xPosition = 0;
         yPosition = 0;
-        hideImages();
+        hideInstructions();
         if(xCellPosition == 0 && yCellPosition == 0)
            $(this).css("background-color","rgb(6, 104, 87)"); 
         else
@@ -42,7 +55,48 @@ $(document).ready(function(){
 });
 
     });
-
+    websocket.addEventListener('open', () => {
+        console.log('we are connected')
+    })
+    websocket.addEventListener('message', ({data}) => {
+        var score = document.getElementById("score")
+        var honest = document.getElementById('honest')
+        var cells = document.getElementsByClassName("cell")
+        var gameStatus = document.getElementById("ins")
+        
+        if(data.toString() === "ok") {
+            for(const element of cells) {
+                if( parseInt($(element).attr('xCoord')) === xPosition &&
+                    parseInt($(element).attr('yCoord')) === yPosition &&
+                    String($(element).attr('visited')) === "false" ) {
+                        scoreValue+=1
+                        $(element).attr('visited', "true")
+                    }
+            }
+      }
+       if(scoreValue == 59)
+         {
+            $(".cell").css('background', "green")
+            gameStatus.innerHTML = "WINNER"
+            gameStatus.style.background = "green"
+            showMines();
+            en = false
+         }       
+        if(data.toString() === "notok")
+           honestValue = false   
+        score.innerHTML = "score: " + scoreValue
+        if(honestValue === true)
+             honest.innerHTML = "honest"
+        else
+             honest.innerHTML = "cheater"    
+        if(data.toString() === "bomb") {
+            $(".cell").css('background', 'rgb(256, 0, 0)')
+            gameStatus.innerHTML = "GAME OVER"
+            gameStatus.style.background = "red"
+            en =false
+        }
+                  
+     })
 //scrolling by arrow keys disabled
 window.addEventListener("keydown", function(e) {
     if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
@@ -55,6 +109,7 @@ window.addEventListener('load', () => {
     yPosition = 0;
 });
 window.addEventListener('keyup', (e) => {
+      if(en == true) {
        switch(e.key) {
         case 'ArrowDown':     
             if(xPosition <7)       
@@ -119,6 +174,7 @@ window.addEventListener('keyup', (e) => {
         var coord2 = new String(yPosition)
         var coord = coord1.concat(",").concat(coord2)
         websocket.send(coord)    
+    }
     
 });
 
@@ -171,6 +227,33 @@ function hideImages(){
     elem = document.getElementById("file1"); 
        elem.style.visibility = "hidden"
 }
+function showMines(){
+      var elem = document.getElementById("bomb1");
+      elem.style.visibility = "visible";
+      var elem = document.getElementById("bomb2");
+      elem.style.visibility = "visible";
+      var elem = document.getElementById("bomb3");
+      elem.style.visibility = "visible";
+      var elem = document.getElementById("bomb4");
+      elem.style.visibility = "visible";  
+
+}
+function hideMines(){
+    var elem = document.getElementById("bomb1");
+    elem.style.visibility = "hidden";
+    var elem = document.getElementById("bomb2");
+    elem.style.visibility = "hidden";
+    var elem = document.getElementById("bomb3");
+    elem.style.visibility = "hidden";
+    var elem = document.getElementById("bomb4");
+    elem.style.visibility = "hidden";  
+}
+function hideInstructions(){
+    var elements = document.getElementsByClassName('cellImg')
+    for(const elem of elements) {
+        elem.style.visibility = "hidden"
+    }
+}
 function showInstruction() {
     var instr = document.getElementById("ins");
     if(xPosition == 0 && yPosition == 0)
@@ -220,7 +303,6 @@ function showInstruction() {
         return}
     else 
         instr.innerHTML = ""                           
-
 }
 
 
